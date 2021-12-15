@@ -83,20 +83,7 @@ namespace DogGo.Controllers
             }
         }
 
-        // POST: DogController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        // GET: DogController/Delete/5
         public ActionResult Delete(int id)
         {
             Dog dog = _dogRepo.GetDogById(id);
@@ -107,14 +94,15 @@ namespace DogGo.Controllers
         // POST: DogController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, Dog dog)
+        public ActionResult Delete(Dog dog)
         {
             try
             {
-                _dogRepo.DeleteDog(id);
+                _dogRepo.DeleteDog(dog.Id);
+
                 return RedirectToAction("Index");
             }
-            catch (Exception ex)
+            catch
             {
                 return View(dog);
             }
