@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DogGo.Repositories;
 using DogGo.Models;
+using DogGo.Models.ViewModels;
 
 namespace DogGo.Controllers
 {
@@ -13,10 +14,20 @@ namespace DogGo.Controllers
     {
 
         private readonly IOwnerRepository _ownerRepo;
+        private readonly IDogRepository _dogRepo;
+        private readonly IWalkerRepository _walkerRepo;
+        private readonly INeighborhoodRepository _neighborhoodRepo;
 
-        public OwnersController(IOwnerRepository repo)
+        public OwnersController(
+            IOwnerRepository ownerRepository,
+            IDogRepository dogRepository,
+            IWalkerRepository walkerRepository,
+            INeighborhoodRepository neighborhoodRepository)
         {
-            _ownerRepo = repo;
+            _ownerRepo = ownerRepository;
+            _dogRepo = dogRepository;
+            _walkerRepo = walkerRepository;
+            _neighborhoodRepo = neighborhoodRepository;
         }
         // GET: OwnersController
         public ActionResult Index()
@@ -26,19 +37,37 @@ namespace DogGo.Controllers
             return View(owners);
         }
 
-        // GET: OwnersController/Details/ownerId
+        // GET: Owners/Details/5
         public ActionResult Details(int id)
         {
             Owner owner = _ownerRepo.GetOwnerById(id);
+            List<Dog> dogs = _dogRepo.GetDogsByOwnerId(owner.Id);
+            List<Walker> walkers = _walkerRepo.GetWalkersInNeighborhood(owner.NeighborhoodId);
 
-            return View(owner);
+            ProfileViewModel vm = new ProfileViewModel()
+            {
+                Owner = owner,
+                Dogs = dogs,
+                Walkers = walkers
+            };
+
+            return View(vm);
         }
 
         // GET: OwnersController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
+ // GET: Owners/Create
+public ActionResult Create()
+{
+    List<Neighborhood> neighborhoods = _neighborhoodRepo.GetAll();
+
+    OwnerFormViewModel vm = new OwnerFormViewModel()
+    {
+        Owner = new Owner(),
+        Neighborhoods = neighborhoods
+    };
+
+    return View(vm);
+}
 
         // POST: OwnersController/Create
         [HttpPost]
@@ -60,17 +89,18 @@ namespace DogGo.Controllers
         // GET: OwnersController/Edit/5
         public ActionResult Edit(int id)
         {
-            Owner owner = _ownerRepo.GetOwnerById(id);
+            List<Neighborhood> neighbors = _neighborhoodRepo.GetAll();
 
-            if (owner == null)
+            OwnerFormViewModel vmOwner = new OwnerFormViewModel
             {
-                return NotFound();
-            }
+                Owner = _ownerRepo.GetOwnerById(id),
+                Neighborhoods = neighbors
+            };
 
-            return View(owner);
+            return View(vmOwner);
         }
 
-        // POST: OwnersController/Edit/5
+        // POST: OwnerController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(Owner owner)
@@ -86,7 +116,6 @@ namespace DogGo.Controllers
                 return View(owner);
             }
         }
-
         // GET: OwnersController/Delete/5
         public ActionResult Delete(int id)
         {

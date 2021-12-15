@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace DogGo.Models
+namespace DogGo.Models.ViewModels
 {
-    public class Owner
+    public class OwnerFormViewModel
     {
+        public Owner Owner { get; set; }
+        public List<Neighborhood> Neighborhoods { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
@@ -15,6 +14,5 @@ namespace DogGo.Models
         public string Address { get; set; }
         public Neighborhood Neighborhood { get; set; }
         public List<Dog> Dogs { get; set; }
-        public List<Neighborhood> Neighborhoods { get; set; }
     }
 }
